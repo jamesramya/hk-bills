@@ -2,6 +2,11 @@
 
 A Node.js backend service that processes receipt images using Google Gemini LLM for OCR extraction. Supports Mandarin and English receipts with three types: Bale Receipt, Pop up Collection Receipt, and Weigh Bridge Receipt.
 
+## Data Format Standards
+- **Weights**: Separated into value and unit objects (e.g., `{"value": 150, "unit": "KG"}`)
+- **Dates**: ISO format YYYY-MM-DDTHH:MM:SSZ (e.g., `"2025-06-17T14:57:00Z"`)
+- **Multiple Receipts**: Each receipt gets its own complete JSON object
+
 ## Features
 
 - **Modular LLM Provider Architecture** - Easy to switch between different LLM providers
@@ -56,7 +61,10 @@ A Node.js backend service that processes receipt images using Google Gemini LLM 
 {
   "supplier": null,
   "date": null,
-  "weight": null,
+  "weight": {
+    "value": null,
+    "unit": null
+  },
   "price_per_unit": null,
   "total_amount": null,
   "receipt_number": null,
@@ -68,11 +76,13 @@ A Node.js backend service that processes receipt images using Google Gemini LLM 
 ```json
 {
   "collection_point": null,
-  "date": null,
-  "time": null,
+  "date_time": null,
   "collector_name": null,
   "items_collected": [],
-  "total_weight": null,
+  "total_weight": {
+    "value": null,
+    "unit": null
+  },
   "receipt_number": null
 }
 ```
@@ -85,9 +95,18 @@ A Node.js backend service that processes receipt images using Google Gemini LLM 
   "vehicle_number": null,
   "company": null,
   "location": null,
-  "gross_weight": null,
-  "tare_weight": null,
-  "nett_weight": null,
+  "gross_weight": {
+    "value": null,
+    "unit": null
+  },
+  "tare_weight": {
+    "value": null,
+    "unit": null
+  },
+  "nett_weight": {
+    "value": null,
+    "unit": null
+  },
   "operator": null,
   "remarks": null
 }

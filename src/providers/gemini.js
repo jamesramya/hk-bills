@@ -42,13 +42,17 @@ Instructions:
 4. If there are MULTIPLE receipts, return an array of JSON objects, where each object represents one receipt
 5. Map the extracted information from each receipt to the provided JSON format
 6. Keep field values in their original language (Mandarin/English) from the image
-7. If a field cannot be found in a receipt, use null as the value
-8. Return ONLY the JSON (single object or array of objects), no additional text
-9. Ensure the response is valid JSON
+7. For WEIGHT fields: separate numeric value from units (e.g., "150 KG" becomes {"value": 150, "unit": "KG"})
+8. For DATE/TIME fields: convert to ISO format YYYY-MM-DDTHH:MM:SSZ (e.g., "2025/06/17 14:57" becomes "2025-06-17T14:57:00Z")
+9. If a field cannot be found in a receipt, use null as the value
+10. Return ONLY the JSON (single object or array of objects), no additional text
+11. Ensure the response is valid JSON
 
 Examples:
 - Single receipt: return { "field1": "value1", ... }
-- Multiple receipts: return [{ "field1": "value1", ... }, { "field1": "value2", ... }]`;
+- Multiple receipts: return [{ "field1": "value1", ... }, { "field1": "value2", ... }]
+- Weight format: {"value": 150, "unit": "KG"}
+- Date format: "2025-06-17T14:57:00Z"`;
 
       const result = await this.model.generateContent([fullPrompt, imagePart]);
       const response = await result.response;

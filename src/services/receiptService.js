@@ -10,7 +10,10 @@ class ReceiptService {
       bale: {
         supplier: null,
         date: null,
-        weight: null,
+        weight: {
+          value: null,
+          unit: null
+        },
         price_per_unit: null,
         total_amount: null,
         receipt_number: null,
@@ -18,11 +21,13 @@ class ReceiptService {
       },
       popup_collection: {
         collection_point: null,
-        date: null,
-        time: null,
+        date_time: null,
         collector_name: null,
         items_collected: [],
-        total_weight: null,
+        total_weight: {
+          value: null,
+          unit: null
+        },
         receipt_number: null
       },
       weigh_bridge: {
@@ -31,9 +36,18 @@ class ReceiptService {
         vehicle_number: null,
         company: null,
         location: null,
-        gross_weight: null,
-        tare_weight: null,
-        nett_weight: null,
+        gross_weight: {
+          value: null,
+          unit: null
+        },
+        tare_weight: {
+          value: null,
+          unit: null
+        },
+        nett_weight: {
+          value: null,
+          unit: null
+        },
         operator: null,
         remarks: null
       }
