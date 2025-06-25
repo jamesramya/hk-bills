@@ -1,7 +1,7 @@
 const config = require('../config/config');
 
 const validateReceiptType = (req, res, next) => {
-  const validTypes = ['bale', 'popup_collection', 'weigh_bridge'];
+  const validTypes = ['bale', 'popup_collection', 'weigh_bridge', 'purchase'];
   const { receiptType } = req.body;
 
   if (!receiptType) {

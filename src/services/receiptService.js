@@ -14,8 +14,14 @@ class ReceiptService {
           value: null,
           unit: null
         },
-        price_per_unit: null,
-        total_amount: null,
+        price_per_unit: {
+          value: null,
+          unit: null
+        },
+        total_amount: {
+          value: null,
+          unit: null
+        },
         receipt_number: null,
         items: []
       },
@@ -50,6 +56,24 @@ class ReceiptService {
         },
         operator: null,
         remarks: null
+      },
+      purchase: {
+        receipt_numbers: [],
+        date_time: null,
+        collector: null,
+        collected_location: null,
+        pet_volume: {
+          value: null,
+          unit: null
+        },
+        mode_of_transportation: null,
+        dww_code: null,
+        cleaner_name: null,
+        material_value: {
+          value: null,
+          unit: null
+        },
+        storage: null
       }
     };
   }

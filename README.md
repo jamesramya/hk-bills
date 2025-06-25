@@ -1,9 +1,9 @@
 # Receipt OCR Backend
 
-A Node.js backend service that processes receipt images using Google Gemini LLM for OCR extraction. Supports Mandarin and English receipts with three types: Bale Receipt, Pop up Collection Receipt, and Weigh Bridge Receipt.
+A Node.js backend service that processes receipt images using Google Gemini LLM for OCR extraction. Supports Mandarin and English receipts with four types: Bale Receipt, Pop up Collection Receipt, Weigh Bridge Receipt, and Purchase Receipt.
 
 ## Data Format Standards
-- **Weights**: Separated into value and unit objects (e.g., `{"value": 150, "unit": "KG"}`)
+- **Weights/Volumes/Values**: Separated into value and unit objects (e.g., `{"value": 150, "unit": "KG"}`)
 - **Dates**: ISO format YYYY-MM-DDTHH:MM:SSZ (e.g., `"2025-06-17T14:57:00Z"`)
 - **Multiple Receipts**: Each receipt gets its own complete JSON object
 
@@ -65,8 +65,14 @@ A Node.js backend service that processes receipt images using Google Gemini LLM 
     "value": null,
     "unit": null
   },
-  "price_per_unit": null,
-  "total_amount": null,
+  "price_per_unit": {
+    "value": null,
+    "unit": null
+  },
+  "total_amount": {
+    "value": null,
+    "unit": null
+  },
   "receipt_number": null,
   "items": []
 }
@@ -109,6 +115,28 @@ A Node.js backend service that processes receipt images using Google Gemini LLM 
   },
   "operator": null,
   "remarks": null
+}
+```
+
+### Purchase Receipt
+```json
+{
+  "receipt_numbers": [],
+  "date_time": null,
+  "collector": null,
+  "collected_location": null,
+  "pet_volume": {
+    "value": null,
+    "unit": null
+  },
+  "mode_of_transportation": null,
+  "dww_code": null,
+  "cleaner_name": null,
+  "material_value": {
+    "value": null,
+    "unit": null
+  },
+  "storage": null
 }
 ```
 
