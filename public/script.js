@@ -109,8 +109,17 @@ class ReceiptProcessor {
             const result = await response.json();
 
             if (result.success) {
+                const receiptCount = result.count || result.data.length;
                 this.showResults(result.data, imageFile);
-                this.showSuccess('Receipt processed successfully!');
+                this.showSuccess(`Receipt processed successfully! Found ${receiptCount} receipt${receiptCount > 1 ? 's' : ''}.`);
+                
+                // Update receipt info
+                const receiptInfo = document.getElementById('receiptCount');
+                if (receiptCount > 1) {
+                    receiptInfo.textContent = `${receiptCount} receipts detected and processed separately`;
+                } else {
+                    receiptInfo.textContent = `1 receipt detected and processed`;
+                }
             } else {
                 this.showError(result.error);
             }
@@ -133,8 +142,13 @@ class ReceiptProcessor {
         };
         reader.readAsDataURL(imageFile);
 
-        // Show JSON output
-        jsonOutput.textContent = JSON.stringify(data, null, 2);
+        // Show JSON output with receipt count info
+        const displayData = {
+            receipts_detected: data.length,
+            receipts: data
+        };
+        
+        jsonOutput.textContent = JSON.stringify(displayData, null, 2);
         
         resultsSection.style.display = 'grid';
         resultsSection.scrollIntoView({ behavior: 'smooth' });

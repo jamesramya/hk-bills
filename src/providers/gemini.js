@@ -32,28 +32,42 @@ class GeminiProvider extends BaseLLMProvider {
 
       const fullPrompt = `${prompt}
 
-Expected JSON format:
+Expected JSON format for EACH receipt:
 ${JSON.stringify(expectedFormat, null, 2)}
 
 Instructions:
 1. Extract text from the receipt image using OCR
-2. Map the extracted information to the provided JSON format
-3. Keep field values in their original language (Mandarin/English) from the image
-4. Return ONLY the filled JSON object, no additional text
-5. If a field cannot be found, use null as the value
-6. Ensure the response is valid JSON`;
+2. Identify how many separate receipts are in the image
+3. If there is only ONE receipt, return a single JSON object following the format above
+4. If there are MULTIPLE receipts, return an array of JSON objects, where each object represents one receipt
+5. Map the extracted information from each receipt to the provided JSON format
+6. Keep field values in their original language (Mandarin/English) from the image
+7. If a field cannot be found in a receipt, use null as the value
+8. Return ONLY the JSON (single object or array of objects), no additional text
+9. Ensure the response is valid JSON
+
+Examples:
+- Single receipt: return { "field1": "value1", ... }
+- Multiple receipts: return [{ "field1": "value1", ... }, { "field1": "value2", ... }]`;
 
       const result = await this.model.generateContent([fullPrompt, imagePart]);
       const response = await result.response;
       const text = response.text();
       
-      // Clean the response to extract only JSON
-      const jsonMatch = text.match(/\{[\s\S]*\}/);
+      // Clean the response to extract only JSON (object or array)
+      const jsonMatch = text.match(/(\{[\s\S]*\}|\[[\s\S]*\])/);
       if (!jsonMatch) {
         throw new Error('No valid JSON found in response');
       }
 
-      return JSON.parse(jsonMatch[0]);
+      const parsedResult = JSON.parse(jsonMatch[0]);
+      
+      // Ensure we always return an array for consistency
+      if (Array.isArray(parsedResult)) {
+        return parsedResult;
+      } else {
+        return [parsedResult]; // Wrap single receipt in array
+      }
     } catch (error) {
       throw new Error(`Gemini processing failed: ${error.message}`);
     }

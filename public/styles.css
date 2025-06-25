@@ -199,6 +199,19 @@ button:disabled {
     white-space: pre-wrap;
 }
 
+.receipt-info {
+    margin-top: 10px;
+    padding: 10px;
+    background-color: #e8f4fd;
+    border-radius: 4px;
+    border-left: 4px solid #3498db;
+}
+
+.receipt-info small {
+    color: #2c3e50;
+    font-style: italic;
+}
+
 .loading {
     text-align: center;
     background: white;

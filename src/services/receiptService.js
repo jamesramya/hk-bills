@@ -51,11 +51,13 @@ class ReceiptService {
     const prompt = `Please extract information from this ${receiptType.replace('_', ' ')} receipt image and fill in the provided JSON format.`;
     
     try {
-      const result = await this.llmProvider.processImage(imageBuffer, prompt, template);
+      const results = await this.llmProvider.processImage(imageBuffer, prompt, template);
+      
       return {
         success: true,
-        data: result,
-        receiptType: receiptType
+        data: results, // Now an array of receipt objects
+        receiptType: receiptType,
+        count: results.length
       };
     } catch (error) {
       throw new Error(`Receipt processing failed: ${error.message}`);
