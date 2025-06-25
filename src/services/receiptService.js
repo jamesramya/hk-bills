@@ -86,7 +86,7 @@ class ReceiptService {
       throw new Error(`Unsupported receipt type: ${receiptType}`);
     }
 
-    const prompt = `Please extract information from this ${receiptType.replace('_', ' ')} receipt image and fill in the provided JSON format.`;
+    const prompt = `Please extract information from this ${receiptType.replace(/_/g, ' ')} receipt image and fill in the provided JSON format.`;
     
     try {
       const results = await this.llmProvider.processImage(imageBuffer, prompt, template);
