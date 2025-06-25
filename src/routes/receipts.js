@@ -35,6 +35,7 @@ router.post('/process', rateLimiter(), upload.single('image'), processImage, val
       success: true,
       data: result.data,
       receiptType: result.receiptType,
+      count: result.count,
       imageSize: req.file.size,
       processedAt: new Date().toISOString()
     });
