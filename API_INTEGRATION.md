@@ -65,7 +65,9 @@ https://your-railway-app.railway.app
 ```
 
 ### 3. Health Check
-**Endpoint:** `GET /health`
+**Endpoint:** `GET /api/receipts/health`
+
+(Root level `GET /health` is also available for quick status checks.)
 
 **Response:**
 ```json
@@ -450,7 +452,7 @@ void runAPITests() async {
 ### Debugging Tips
 - Enable logging for all API calls
 - Test with the web interface first
-- Use the health check endpoint to verify connectivity
+- Use the health check endpoint (`/api/receipts/health`) to verify connectivity
 - Check response headers for additional error information
 
 ---
