@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Receipt OCR Processor</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Receipt OCR Processor</h1>
+            <p>Upload receipt images for automatic data extraction</p>
+        </header>
+
+        <main>
+            <div class="upload-section">
+                <div class="form-container">
+                    <form id="receiptForm" enctype="multipart/form-data">
+                        <div class="form-group">
+                            <label for="receiptType">Receipt Type:</label>
+                            <select id="receiptType" name="receiptType" required>
+                                <option value="">Select receipt type...</option>
+                                <option value="bale">Bale Receipt</option>
+                                <option value="popup_collection">Pop up Collection Receipt</option>
+                                <option value="weigh_bridge">Weigh Bridge Receipt</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="imageFile">Upload Image:</label>
+                            <div class="file-input-container">
+                                <input type="file" id="imageFile" name="image" accept="image/*" required>
+                                <div class="file-input-label">
+                                    <span id="file-label-text">Choose file or drag & drop</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit" id="submitBtn">Process Receipt</button>
+                    </form>
+                </div>
+
+                <div class="template-section">
+                    <h3>Expected JSON Format</h3>
+                    <div class="template-container">
+                        <pre id="jsonTemplate">Select a receipt type to see the expected format</pre>
+                    </div>
+                </div>
+            </div>
+
+            <div class="results-section" id="resultsSection" style="display: none;">
+                <div class="image-preview">
+                    <h3>Uploaded Image</h3>
+                    <img id="previewImage" alt="Uploaded receipt">
+                </div>
+
+                <div class="json-output">
+                    <h3>Extracted Data 
+                        <button id="copyBtn" class="copy-btn">Copy JSON</button>
+                    </h3>
+                    <div class="json-container">
+                        <pre id="jsonOutput"></pre>
+                    </div>
+                </div>
+            </div>
+
+            <div class="loading" id="loading" style="display: none;">
+                <div class="spinner"></div>
+                <p>Processing receipt...</p>
+            </div>
+
+            <div class="error-message" id="errorMessage" style="display: none;"></div>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

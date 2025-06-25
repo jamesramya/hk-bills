@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: receipt-ocr-backend
+    env: node
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/receipts/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: GOOGLE_GEMINI_API_KEY
+        sync: false
