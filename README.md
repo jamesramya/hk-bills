@@ -54,6 +54,10 @@ A Node.js backend service that processes receipt images using Google Gemini LLM 
 - `POST /api/receipts/process` - Process receipt image
 - `GET /api/receipts/health` - Health check
 
+## Mobile Developer Integration
+
+📱 **For mobile developers:** See [API_INTEGRATION.md](./API_INTEGRATION.md) for comprehensive Flutter integration guide with code examples, error handling, and best practices.
+
 ## Receipt Types
 
 ### Bale Receipt
