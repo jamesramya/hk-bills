@@ -12,11 +12,16 @@ class GeminiProvider extends BaseLLMProvider {
 
   validateConfig() {
     if (!config.gemini.apiKey) {
-      throw new Error('Google Gemini API key is required');
+      console.warn('Warning: Google Gemini API key is not set. Set GOOGLE_GEMINI_API_KEY environment variable.');
+      // Don't throw error on startup, handle it at request time
     }
   }
 
   async processImage(imageBuffer, prompt, expectedFormat) {
+    if (!config.gemini.apiKey) {
+      throw new Error('Google Gemini API key is not configured. Please set GOOGLE_GEMINI_API_KEY environment variable.');
+    }
+    
     try {
       const imagePart = {
         inlineData: {

@@ -17,6 +17,15 @@ app.use(express.static(path.join(__dirname, '../public')));
 // API Routes
 app.use('/api/receipts', receiptRoutes);
 
+// Health check endpoint at root level
+app.get('/health', (req, res) => {
+  res.json({
+    success: true,
+    message: 'Server is running',
+    timestamp: new Date().toISOString()
+  });
+});
+
 // Root endpoint
 app.get('/api', (req, res) => {
   res.json({
@@ -46,8 +55,10 @@ app.use((error, req, res, next) => {
 
 // Start server
 const PORT = config.port;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-  console.log(`API available at http://localhost:${PORT}/api`);
-  console.log(`Frontend available at http://localhost:${PORT}`);
+const HOST = process.env.HOST || '0.0.0.0';
+
+app.listen(PORT, HOST, () => {
+  console.log(`Server running on ${HOST}:${PORT}`);
+  console.log(`API available at http://${HOST}:${PORT}/api`);
+  console.log(`Frontend available at http://${HOST}:${PORT}`);
 });
