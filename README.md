@@ -48,6 +48,14 @@ A Node.js backend service that processes receipt images using Google Gemini LLM 
 
 6. Open http://localhost:3000 in your browser
 
+### Running Tests
+
+Run the Jest test suite with:
+
+```bash
+npm test
+```
+
 ## API Endpoints
 
 - `GET /api/receipts/types` - Get available receipt types and templates

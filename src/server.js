@@ -53,12 +53,16 @@ app.use((error, req, res, next) => {
   });
 });
 
-// Start server
+// Start server only when this file is executed directly
 const PORT = config.port;
 const HOST = process.env.HOST || '0.0.0.0';
 
-app.listen(PORT, HOST, () => {
-  console.log(`Server running on ${HOST}:${PORT}`);
-  console.log(`API available at http://${HOST}:${PORT}/api`);
-  console.log(`Frontend available at http://${HOST}:${PORT}`);
-});
+if (require.main === module) {
+  app.listen(PORT, HOST, () => {
+    console.log(`Server running on ${HOST}:${PORT}`);
+    console.log(`API available at http://${HOST}:${PORT}/api`);
+    console.log(`Frontend available at http://${HOST}:${PORT}`);
+  });
+}
+
+module.exports = app;
