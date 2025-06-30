@@ -5,9 +5,8 @@ This document provides comprehensive integration guidelines for mobile developer
 
 ## Base URL
 ```
-https://your-railway-app.railway.app
+https://hk-bills-production.up.railway.app
 ```
-*Replace with your actual Railway deployment URL*
 
 ## Authentication
 **No authentication required** - This is a prototype system.
@@ -155,7 +154,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class ReceiptAPI {
-  static const String baseUrl = 'https://your-railway-app.railway.app';
+  static const String baseUrl = 'https://hk-bills-production.up.railway.app';
   
   // Get receipt types
   static Future<Map<String, dynamic>> getReceiptTypes() async {
@@ -213,7 +212,7 @@ import 'dart:io';
 class ReceiptAPIDio {
   static final Dio _dio = Dio(
     BaseOptions(
-      baseUrl: 'https://your-railway-app.railway.app',
+      baseUrl: 'https://hk-bills-production.up.railway.app',
       connectTimeout: const Duration(seconds: 10),
       receiveTimeout: const Duration(seconds: 60), // Long timeout for processing
     ),
@@ -342,12 +341,20 @@ String unit = result['gross_weight']['unit'];
 ```
 
 ### Common Error Scenarios
-1. **Invalid file format** (413 status)
-2. **File too large** (413 status)
-3. **Missing parameters** (400 status)
-4. **Rate limit exceeded** (429 status)
-5. **Processing timeout** (500 status)
-6. **Gemini API issues** (500 status)
+1. **Missing image file** (400 status)
+   - `"Image file is required"`
+2. **Invalid file format** (400 status)
+   - `"Invalid file type. Only JPEG, PNG, and WebP images are allowed"`
+3. **File too large** (400 status)
+   - `"File size exceeds limit of 10MB"`
+4. **Invalid receipt type** (400 status)
+   - `"Invalid receipt type. Valid types are: bale, popup_collection, weigh_bridge, purchase"`
+5. **Image processing failure** (400 status)
+   - `"Invalid or corrupted image file. Please use a valid JPEG, PNG, or WebP image"`
+6. **Rate limit exceeded** (429 status)
+   - `"Too many requests. Please try again later"`
+7. **Server errors** (500 status)
+   - `"Receipt processing failed: [specific error message]"`
 
 ### Flutter Error Handling Example
 ```dart
@@ -454,6 +461,30 @@ void runAPITests() async {
 - Test with the web interface first
 - Use the health check endpoint (`/api/receipts/health`) to verify connectivity
 - Check response headers for additional error information
+
+---
+
+## Recent Updates & Changelog
+
+### 2025-06-30 - Mobile App Fix
+- **Fixed:** HTTP 500 errors when mobile apps send images that cannot be processed
+- **Improved:** Error handling now returns specific 400 errors instead of generic 500 errors
+- **Enhanced:** Better error messages for debugging:
+  - Invalid/corrupted image files
+  - File type validation
+  - File size validation
+- **Technical:** Reordered middleware to validate files before processing
+
+### Error Handling Improvements
+The API now provides much better error feedback for mobile developers:
+
+- **Before:** Generic 500 "Internal Server Error" 
+- **After:** Specific 400 errors with clear messages like:
+  - `"Invalid or corrupted image file. Please use a valid JPEG, PNG, or WebP image"`
+  - `"File size exceeds limit of 10MB"`
+  - `"Invalid file type. Only JPEG, PNG, and WebP images are allowed"`
+
+This makes debugging much easier for mobile app integration.
 
 ---
 
