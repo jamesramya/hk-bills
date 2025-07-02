@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { upload, processImage } = require('../middleware/upload');
+const { upload, handleBase64Image, processImage } = require('../middleware/upload');
 const { validateReceiptType, validateImageFile, rateLimiter } = require('../middleware/validation');
 const ReceiptService = require('../services/receiptService');
 
@@ -26,7 +26,7 @@ router.get('/types', async (req, res) => {
 });
 
 // Process receipt image
-router.post('/process', rateLimiter(), upload.single('image'), processImage, validateImageFile, validateReceiptType, async (req, res) => {
+router.post('/process', rateLimiter(), upload.single('image'), handleBase64Image, validateImageFile, validateReceiptType, processImage, async (req, res) => {
   try {
     const { receiptType } = req.body;
     const result = await receiptService.processReceipt(req.file.buffer, receiptType);

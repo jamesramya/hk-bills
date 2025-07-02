@@ -29,6 +29,9 @@ const validateImageFile = (req, res, next) => {
     });
   }
 
+  console.log('Received file MIME type:', req.file.mimetype);
+  console.log('Allowed MIME types:', config.upload.allowedMimeTypes);
+
   if (!config.upload.allowedMimeTypes.includes(req.file.mimetype)) {
     return res.status(400).json({
       success: false,
