@@ -33,6 +33,10 @@ https://hk-bills-production.up.railway.app
 ```
 
 ### 2. Process Receipt Image
+
+The API supports **two methods** for uploading images:
+
+#### Method 1: Multipart File Upload
 **Endpoint:** `POST /api/receipts/process`
 
 **Content-Type:** `multipart/form-data`
@@ -41,7 +45,27 @@ https://hk-bills-production.up.railway.app
 - `image`: File (JPEG/PNG/WebP, max 10MB)
 - `receiptType`: String (one of: `bale`, `popup_collection`, `weigh_bridge`, `purchase`)
 
-**Response:**
+#### Method 2: Base64 Image Upload
+**Endpoint:** `POST /api/receipts/process`
+
+**Content-Type:** `application/json`
+
+**Parameters:**
+```json
+{
+  "imageBase64": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAA...",
+  "receiptType": "weigh_bridge"
+}
+```
+
+**Base64 Format Options:**
+- **Data URL format** (recommended): `"data:image/png;base64,<base64_data>"`
+- **Plain base64**: Just the base64 string (assumes PNG format)
+
+**Supported formats:** JPEG, PNG, WebP  
+**Maximum size:** 10MB
+
+**Response (same for both methods):**
 ```json
 {
   "success": true,
@@ -150,8 +174,8 @@ dependencies:
 ### Using HTTP Package
 ```dart
 import 'dart:io';
-import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 class ReceiptAPI {
   static const String baseUrl = 'https://hk-bills-production.up.railway.app';
@@ -170,8 +194,8 @@ class ReceiptAPI {
     }
   }
   
-  // Process receipt image
-  static Future<Map<String, dynamic>> processReceipt({
+  // Method 1: Process receipt image using multipart upload
+  static Future<Map<String, dynamic>> processReceiptMultipart({
     required File imageFile,
     required String receiptType,
   }) async {
@@ -201,6 +225,73 @@ class ReceiptAPI {
       throw Exception('Failed to process receipt: ${response.body}');
     }
   }
+  
+  // Method 2: Process receipt image using base64 upload
+  static Future<Map<String, dynamic>> processReceiptBase64({
+    required File imageFile,
+    required String receiptType,
+  }) async {
+    // Convert image to base64
+    final bytes = await imageFile.readAsBytes();
+    final base64Image = base64Encode(bytes);
+    
+    // Determine MIME type from file extension
+    String mimeType = 'image/png';
+    final extension = imageFile.path.split('.').last.toLowerCase();
+    switch (extension) {
+      case 'jpg':
+      case 'jpeg':
+        mimeType = 'image/jpeg';
+        break;
+      case 'png':
+        mimeType = 'image/png';
+        break;
+      case 'webp':
+        mimeType = 'image/webp';
+        break;
+    }
+    
+    // Create data URL format
+    final dataUrl = 'data:$mimeType;base64,$base64Image';
+    
+    final response = await http.post(
+      Uri.parse('$baseUrl/api/receipts/process'),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: json.encode({
+        'imageBase64': dataUrl,
+        'receiptType': receiptType,
+      }),
+    ).timeout(const Duration(seconds: 60));
+    
+    if (response.statusCode == 200) {
+      return json.decode(response.body);
+    } else {
+      throw Exception('Failed to process receipt: ${response.body}');
+    }
+  }
+  
+  // Convenience method that tries base64 first, falls back to multipart
+  static Future<Map<String, dynamic>> processReceipt({
+    required File imageFile,
+    required String receiptType,
+  }) async {
+    try {
+      // Try base64 method first (better for mobile)
+      return await processReceiptBase64(
+        imageFile: imageFile,
+        receiptType: receiptType,
+      );
+    } catch (e) {
+      // Fallback to multipart if base64 fails
+      print('Base64 upload failed, trying multipart: $e');
+      return await processReceiptMultipart(
+        imageFile: imageFile,
+        receiptType: receiptType,
+      );
+    }
+  }
 }
 ```
 
@@ -208,6 +299,7 @@ class ReceiptAPI {
 ```dart
 import 'package:dio/dio.dart';
 import 'dart:io';
+import 'dart:convert';
 
 class ReceiptAPIDio {
   static final Dio _dio = Dio(
@@ -218,7 +310,8 @@ class ReceiptAPIDio {
     ),
   );
   
-  static Future<Map<String, dynamic>> processReceipt({
+  // Method 1: Multipart upload
+  static Future<Map<String, dynamic>> processReceiptMultipart({
     required File imageFile,
     required String receiptType,
   }) async {
@@ -239,6 +332,72 @@ class ReceiptAPIDio {
       return response.data;
     } catch (e) {
       throw Exception('Failed to process receipt: $e');
+    }
+  }
+  
+  // Method 2: Base64 upload
+  static Future<Map<String, dynamic>> processReceiptBase64({
+    required File imageFile,
+    required String receiptType,
+  }) async {
+    // Convert image to base64
+    final bytes = await imageFile.readAsBytes();
+    final base64Image = base64Encode(bytes);
+    
+    // Determine MIME type from file extension
+    String mimeType = 'image/png';
+    final extension = imageFile.path.split('.').last.toLowerCase();
+    switch (extension) {
+      case 'jpg':
+      case 'jpeg':
+        mimeType = 'image/jpeg';
+        break;
+      case 'png':
+        mimeType = 'image/png';
+        break;
+      case 'webp':
+        mimeType = 'image/webp';
+        break;
+    }
+    
+    final dataUrl = 'data:$mimeType;base64,$base64Image';
+    
+    try {
+      Response response = await _dio.post(
+        '/api/receipts/process',
+        data: {
+          'imageBase64': dataUrl,
+          'receiptType': receiptType,
+        },
+        options: Options(
+          headers: {'Content-Type': 'application/json'},
+        ),
+      );
+      
+      return response.data;
+    } catch (e) {
+      throw Exception('Failed to process receipt: $e');
+    }
+  }
+  
+  // Convenience method with fallback
+  static Future<Map<String, dynamic>> processReceipt({
+    required File imageFile,
+    required String receiptType,
+  }) async {
+    try {
+      // Try base64 method first
+      return await processReceiptBase64(
+        imageFile: imageFile,
+        receiptType: receiptType,
+      );
+    } catch (e) {
+      // Fallback to multipart
+      print('Base64 upload failed, trying multipart: $e');
+      return await processReceiptMultipart(
+        imageFile: imageFile,
+        receiptType: receiptType,
+      );
     }
   }
 }
@@ -465,6 +624,19 @@ void runAPITests() async {
 ---
 
 ## Recent Updates & Changelog
+
+### 2025-07-02 - Base64 Image Upload Support
+- **New Feature:** Added support for base64 image uploads alongside existing multipart file uploads
+- **Enhanced:** Mobile developers can now choose between two upload methods:
+  - **Method 1:** Multipart file upload (existing method)
+  - **Method 2:** Base64 JSON upload (new method, recommended for mobile)
+- **Improved:** Better compatibility with mobile apps that have issues with multipart uploads
+- **Updated:** Flutter integration examples now include both methods with automatic fallback
+- **Technical Details:**
+  - Base64 images sent as `imageBase64` field in JSON request body
+  - Supports both data URL format (`data:image/png;base64,...`) and plain base64
+  - Same validation and processing pipeline for both methods
+  - Same response format regardless of upload method
 
 ### 2025-06-30 - Mobile App Fix
 - **Fixed:** HTTP 500 errors when mobile apps send images that cannot be processed
